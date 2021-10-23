@@ -1,12 +1,15 @@
 id: org.kde.kstars
 
 runtime: org.kde.Platform  
-runtime-version: '5.15'
+runtime-version: '5.15-21.08'
 
 sdk: org.kde.Sdk
 
 command: kstars
 
+build-options:
+  env:
+    -- GSCDAT=/app/share/GSC
 
 # Unable to find INDI Drivers directory: /usr/share/indi - put setting in 
 # INDI settings to /app/share/indi
@@ -22,6 +25,9 @@ finish-args:
   - --filesystem=home
   #- --filesystem=xdg-config/kdeglobals:ro
   #- --persist=.
+  - --env=GSCDAT=/app/share/GSC
+  - --env=GSCBIN=/app/share/bin
+
   
 
 
@@ -109,25 +115,25 @@ modules:
   - name: wcslib
     sources:
         - type: archive
-          url: ftp://ftp.atnf.csiro.au/pub/software/wcslib/wcslib.tar.bz2
-          sha256: ccfc220d353b489c72a8cfce8fe5c4479e2ad0dc0824a4480262274ae5b80b5c
+          url: ftp://ftp.atnf.csiro.au/pub/software/wcslib/wcslib-7.7.tar.bz2
+          sha256: a708e6b4e90e2cd6427434715b591bb9c3d4005c99725ec494b8e0bed2de5355
  
 
-  - name: xplanet
-    buildsystem: simple
+  #- name: xplanet
+  #  buildsystem: simple
 
-    build-commands:
-      - ./configure LIBS="-pthread -lcurl -lm" --without-pgplot --disable-fortran
-      - make install
+  #  build-commands:
+  #    - ./configure LIBS="-pthread -lcurl -lm" --without-pgplot --disable-fortran
+  #    - make install
 
-    sources:
-        - type: archive
-          url: https://downloads.sourceforge.net/project/xplanet/xplanet/1.3.0/xplanet-1.3.0.tar.gz?r=https%3A%2F%2Fsourceforge.net%2Fprojects%2Fxplanet%2Ffiles%2Fxplanet%2F1.3.0%2Fxplanet-1.3.0.tar.gz%2Fdownload&ts=1602366092
-          sha256: 44fb742bb93e5661ea8b11ccabcc12896693e051f3dd5083c9227224c416b442
-        - type: patch
-          path: gcc-6.patch
-        - type: patch
-          path: giflib5.diff 
+  #  sources:
+  #      - type: archive
+  #        url: https://downloads.sourceforge.net/project/xplanet/xplanet/1.3.0/xplanet-1.3.0.tar.gz?r=https%3A%2F%2Fsourceforge.net%2Fprojects%2Fxplanet%2Ffiles%2Fxplanet%2F1.3.0%2Fxplanet-1.3.0.tar.gz%2Fdownload&ts=1602366092
+  #        sha256: 44fb742bb93e5661ea8b11ccabcc12896693e051f3dd5083c9227224c416b442
+  #      - type: patch
+  #        path: gcc-6.patch
+  #      - type: patch
+  #        path: giflib5.diff 
 
 # https://launchpad.net/~mutlaqja/+archive/ppa/+files/gsc_1.0.orig.tar.gz
 
@@ -142,6 +148,25 @@ modules:
         commands: 
           - autoreconf -vfi
 
+  - name: stellarsolver
+    buildsystem: cmake   #-ninja
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DUDEVRULES_INSTALL_DIR=/run/udev/rules.d
+
+    sources:
+      - type: archive
+        url: https://github.com/rlancaste/stellarsolver/archive/refs/tags/1.8.tar.gz
+        sha256: 4f0009dfa76b153848abd9bcbea52b8dc27159133cf6a1db165b16e5c7b04841
+
+  - name: gsc
+    buildsystem: cmake
+
+    sources: 
+      - type: archive
+        url: https://launchpad.net/~mutlaqja/+archive/ubuntu/ppa/+sourcefiles/gsc/1.3~ubuntu21.10.1/gsc_1.3~ubuntu21.10.1.tar.xz
+        sha256: 8d1eaafdb51e8284b69087da74e06ea2713252a77ac04751b27f829360ed3c22
+
   - name: indilib
     buildsystem: cmake   #-ninja
     config-opts:
@@ -150,12 +175,12 @@ modules:
 
     sources:
       - type: archive
-        url: https://github.com/indilib/indi/archive/v1.8.6.tar.gz
-        sha256: 525123277aa96bd8eb23720a8fac97a5d066b012f0023fbabe688bfead7e98d0
+        url: https://github.com/indilib/indi/archive/refs/tags/v1.9.2.tar.gz
+        sha256: 1fca427d73347b6d495ddbc1087b8a7d0f14a3aa829bc7214beba6952118b663
    
   - name: kstars
     buildsystem: cmake-ninja
     sources:
       - type: archive
-        url: https://download.kde.org/stable/kstars/kstars-3.5.0.tar.xz
-        sha256: a1aa6e859b90bedcf88664c13e0cdfef6407aca1ee6eef608310d8a5caa9f33a
+        url: https://download.kde.org/stable/kstars/kstars-3.5.5.tar.xz
+        sha256: 703df56050672af10fc8142296ceaa27134a6a00e8222f3f6677f18ff1ac6b43
