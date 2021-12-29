@@ -1,6 +1,6 @@
 # org.kde.kstars
 
-This is some WIP (stalled?) to create a flatpak for kstars.
+This is some WIP to create a flatpak for kstars.
 
 Build with
 
